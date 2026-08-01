@@ -1,0 +1,135 @@
+:root {
+  color-scheme: light dark;
+  --bg: #f7f7f9;
+  --surface: #ffffff;
+  --text: #1a1a1e;
+  --text-muted: #6b6b76;
+  --border: #e4e4e9;
+  --accent: #3d5afe;
+  --row-hover: #f0f1ff;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #15151a;
+    --surface: #1e1e24;
+    --text: #f2f2f5;
+    --text-muted: #9a9aa5;
+    --border: #2e2e36;
+    --accent: #7c8cff;
+    --row-hover: #262633;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: -apple-system, "Segoe UI", "Malgun Gothic", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  padding: 24px;
+}
+
+header h1 {
+  margin: 0 0 4px;
+  font-size: 1.6rem;
+}
+
+.summary {
+  color: var(--text-muted);
+  margin: 0 0 20px;
+  font-size: 0.95rem;
+}
+
+.controls {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.controls input,
+.controls select {
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.95rem;
+}
+
+.controls input {
+  flex: 1;
+  min-width: 200px;
+}
+
+.table-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 640px;
+}
+
+th, td {
+  text-align: left;
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+th {
+  color: var(--text-muted);
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+tbody tr:hover {
+  background: var(--row-hover);
+}
+
+td.title-cell {
+  white-space: normal;
+  max-width: 280px;
+  font-weight: 500;
+}
+
+.load-more-wrap {
+  display: flex;
+  justify-content: center;
+  margin-top: 18px;
+}
+
+#loadMoreBtn {
+  padding: 10px 24px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--accent);
+  color: #fff;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+#loadMoreBtn:hover {
+  opacity: 0.9;
+}
+
+.loading, .empty {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 32px !important;
+}
+
+footer {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  margin-top: 14px;
+}
