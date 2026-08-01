@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>웹툰 프로젝트 학습 일지</title>
+<style>
+  :root {
+    --bg: #eef1f5;
+    --surface: #ffffff;
+    --surface-2: #f5f7fa;
+    --ink: #1a2233;
+    --ink-muted: #5b6472;
+    --ink-faint: #8891a0;
+    --border: #dde2e9;
+    --accent: #3346c4;
+    --accent-ink: #ffffff;
+    --accent-soft: #e8eafb;
+    --done: #1f8f5f;
+    --done-soft: #e5f5ee;
+    --warn: #b5540e;
+    --warn-soft: #fbeee1;
+    --code-bg: #161a24;
+    --code-ink: #dbe1ee;
+    --code-accent: #8fb2ff;
+    --shadow: 0 1px 2px rgba(20, 24, 35, 0.04), 0 8px 24px -12px rgba(20, 24, 35, 0.12);
+    --radius: 10px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f121a;
+      --surface: #161b26;
+      --surface-2: #1b202c;
+      --ink: #e7eaf2;
+      --ink-muted: #a2aabb;
+      --ink-faint: #6d7688;
+      --border: #2a3040;
+      --accent: #8ea1ff;
+      --accent-ink: #10142a;
+      --accent-soft: #1c2340;
+      --done: #4fd39a;
+      --done-soft: #163429;
+      --warn: #f0a969;
+      --warn-soft: #372413;
+      --code-bg: #0b0e15;
+      --code-ink: #d7deee;
+      --code-accent: #9db8ff;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.5);
+    }
+  }
+
+  * { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    * { animation: none !important; transition: none !important; }
+  }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Segoe UI",
+      "Malgun Gothic", sans-serif;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .shell {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 48px 24px 96px;
+    display: grid;
+    grid-template-columns: 232px minmax(0, 720px);
+    gap: 56px;
+    align-items: start;
+  }
+
+  @media (max-width: 900px) {
+    .shell {
+      grid-template-columns: 1fr;
+      padding: 28px 18px 72px;
+      gap: 24px;
+    }
+  }
+
+  /* ---- masthead ---- */
+  .masthead {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 8px;
+  }
+
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    align-self: flex-start;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: var(--accent-soft);
+    padding: 6px 12px;
+    border-radius: 999px;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: clamp(1.6rem, 1.2rem + 1.6vw, 2.3rem);
+    font-weight: 800;
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+  }
+
+  .subtitle {
+    margin: 0;
+    color: var(--ink-muted);
+    font-size: 1.02rem;
+    max-width: 62ch;
+  }
+
+  .trail {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .trail span {
+    font-size: 0.82rem;
+    color: var(--ink-muted);
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    padding: 5px 11px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+
+  .trail span::after {
+    content: "→";
+    margin-left: 8px;
+    color: var(--ink-faint);
+  }
+  .trail span:last-child::after { content: ""; margin: 0; }
+
+  /* ---- toc ---- */
+  nav.toc {
+    position: sticky;
+    top: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 0.9rem;
+  }
+
+  nav.toc .toc-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 10px;
+  }
+
+  nav.toc a {
+    color: var(--ink-muted);
+    text-decoration: none;
+    padding: 7px 10px;
+    border-radius: 7px;
+    border-left: 2px solid transparent;
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+  }
+
+  nav.toc a:hover {
+    background: var(--surface-2);
+    color: var(--ink);
+  }
+
+  nav.toc a.active {
+    color: var(--accent);
+    border-left-color: var(--accent);
+    background: var(--accent-soft);
+    font-weight: 600;
+  }
+
+  nav.toc .num {
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-faint);
+    font-size: 0.8rem;
+    width: 1.4em;
+  }
+
+  @media (max-width: 900px) {
+    nav.toc {
+      position: static;
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 6px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 12px;
+    }
+    nav.toc .toc-label { display: none; }
+    nav.toc a {
+      border-left: none;
+      border: 1px solid var(--border);
+      font-size: 0.82rem;
+    }
+    nav.toc a.active { border-color: var(--accent); }
+  }
+
+  /* ---- content ---- */
+  main { min-width: 0; }
+
+  section {
+    padding: 40px 0;
+    border-bottom: 1px solid var(--border);
+    scroll-margin-top: 24px;
+  }
+  section:last-child { border-bottom: none; padding-bottom: 0; }
+
+  .kicker {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .kicker .idx {
+    font-variant-numeric: tabular-nums;
+    font-weight: 800;
+    color: var(--accent);
+    font-size: 0.95rem;
+  }
+
+  .tag {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    padding: 3px 9px;
+    border-radius: 999px;
+  }
+  .tag.done { color: var(--done); background: var(--done-soft); }
+  .tag.action { color: var(--accent); background: var(--accent-soft); }
+  .tag.fix { color: var(--warn); background: var(--warn-soft); }
+
+  h2 {
+    margin: 0 0 6px;
+    font-size: 1.35rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+
+  h3 {
+    font-size: 1.02rem;
+    font-weight: 700;
+    margin: 26px 0 10px;
+  }
+
+  section > p.lede {
+    color: var(--ink-muted);
+    margin: 0 0 20px;
+    max-width: 64ch;
+  }
+
+  p { margin: 0 0 14px; max-width: 66ch; }
+  ul, ol { margin: 0 0 16px; padding-left: 1.3em; max-width: 64ch; }
+  li { margin-bottom: 6px; }
+  strong { font-weight: 700; }
+
+  code:not(pre code) {
+    font-family: ui-monospace, "Cascadia Code", "D2Coding", Consolas, monospace;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    padding: 0.1em 0.4em;
+    border-radius: 5px;
+    font-size: 0.88em;
+    color: var(--accent);
+  }
+
+  .codeblock {
+    position: relative;
+    background: var(--code-bg);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    margin: 0 0 18px;
+    overflow: hidden;
+  }
+
+  .codeblock .bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .codeblock .bar .label {
+    font-size: 0.72rem;
+    color: #8994ac;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .codeblock .copy {
+    font-size: 0.72rem;
+    color: #8994ac;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 6px;
+    padding: 3px 9px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .codeblock .copy:hover { color: var(--code-accent); border-color: var(--code-accent); }
+  .codeblock .copy:focus-visible { outline: 2px solid var(--code-accent); outline-offset: 1px; }
+
+  .codeblock pre {
+    margin: 0;
+    padding: 14px 16px 16px;
+    overflow-x: auto;
+  }
+
+  .codeblock code {
+    font-family: ui-monospace, "Cascadia Code", "D2Coding", Consolas, monospace;
+    font-size: 0.85rem;
+    color: var(--code-ink);
+    white-space: pre;
+    line-height: 1.6;
+  }
+
+  .callout {
+    display: flex;
+    gap: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin: 0 0 18px;
+    max-width: 64ch;
+  }
+  .callout.why { border-left-color: var(--accent); }
+  .callout.fix { border-left-color: var(--warn); }
+  .callout .glyph { font-size: 1rem; line-height: 1.6; flex-shrink: 0; }
+  .callout p { margin: 0; color: var(--ink-muted); font-size: 0.93rem; }
+  .callout strong { color: var(--ink); }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0 0 18px;
+    font-size: 0.9rem;
+    background: var(--surface);
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .table-wrap { overflow-x: auto; margin-bottom: 18px; }
+  th, td {
+    text-align: left;
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  th {
+    background: var(--surface-2);
+    color: var(--ink-muted);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    font-weight: 700;
+  }
+  tr:last-child td { border-bottom: none; }
+  td code { white-space: nowrap; }
+
+  .flow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    margin: 0 0 20px;
+  }
+  .flow .step {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 13px;
+    font-size: 0.86rem;
+    font-weight: 600;
+    box-shadow: var(--shadow);
+  }
+  .flow .arrow { color: var(--ink-faint); font-size: 0.9rem; }
+
+  .result {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    background: var(--done-soft);
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin: 0 0 18px;
+    font-size: 0.9rem;
+  }
+  .result .glyph { color: var(--done); font-weight: 800; }
+  .result strong { color: var(--ink); }
+
+  a.link {
+    color: var(--accent);
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .footline {
+    margin-top: 12px;
+    padding-top: 24px;
+    color: var(--ink-faint);
+    font-size: 0.82rem;
+  }
+
+  ::selection { background: var(--accent-soft); color: var(--ink); }
+
+  a:focus-visible, button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  /* ---- print button ---- */
+  .print-btn {
+    position: fixed;
+    top: 20px;
+    right: 24px;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    padding: 9px 15px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    font-family: inherit;
+    color: var(--ink);
+    cursor: pointer;
+  }
+  .print-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .print-btn svg { width: 15px; height: 15px; flex-shrink: 0; }
+
+  @media (max-width: 900px) {
+    .print-btn {
+      position: static;
+      margin-top: 4px;
+      align-self: flex-start;
+    }
+  }
+
+  /* ---- print / PDF output ---- */
+  @media print {
+    .print-btn, nav.toc { display: none !important; }
+
+    :root {
+      --bg: #ffffff;
+      --surface: #ffffff;
+      --surface-2: #f4f5f7;
+      --ink: #16191f;
+      --ink-muted: #4a5162;
+      --ink-faint: #767f90;
+      --border: #d7dbe2;
+      --accent: #2a3bab;
+      --accent-soft: #eceffb;
+      --done: #17754d;
+      --done-soft: #e7f4ee;
+      --warn: #93450b;
+      --warn-soft: #faede0;
+      --code-bg: #1c212c;
+      --code-ink: #e4e8f1;
+      --code-accent: #a9c0ff;
+      --shadow: none;
+    }
+
+    body { background: #fff; }
+
+    .shell {
+      display: block;
+      max-width: 100%;
+      padding: 0;
+    }
+
+    section {
+      break-inside: avoid;
+      padding: 20px 0;
+    }
+
+    h2 { break-after: avoid; }
+    .codeblock, table, .callout, .result, .flow { break-inside: avoid; }
+
+    .codeblock pre, .codeblock code {
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    a.link { color: var(--accent); text-decoration: underline; }
+  }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <button class="print-btn" id="printBtn" type="button">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="6 9 6 2 18 2 18 9"></polyline>
+      <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+      <rect x="6" y="14" width="12" height="8"></rect>
+    </svg>
+    PDF로 저장 / 인쇄
+  </button>
+
+  <div class="masthead">
+    <span class="eyebrow">학습 일지 · 2026-08-01</span>
+    <h1>터미널 한 줄에서 배포된 웹페이지까지</h1>
+    <p class="subtitle">
+      오늘 Claude Code와 함께 진행한 작업을 순서대로 정리했습니다. 터미널이 낯선 초보자도
+      따라 읽으면서 "왜 이 명령을 썼는지"까지 이해할 수 있도록 개념 설명을 함께 붙였습니다.
+    </p>
+    <div class="trail">
+      <span>터미널 정리</span>
+      <span>Git 개념</span>
+      <span>DB 실습</span>
+      <span>Firebase 연결</span>
+      <span>데이터 업로드</span>
+      <span>웹페이지 배포</span>
+      <span>트러블슈팅</span>
+    </div>
+  </div>
+
+  <nav class="toc" aria-label="목차">
+    <span class="toc-label">목차</span>
+    <a href="#overview"><span class="num">00</span>전체 흐름</a>
+    <a href="#terminal"><span class="num">01</span>터미널 환경 정리</a>
+    <a href="#git"><span class="num">02</span>Git 개념</a>
+    <a href="#database"><span class="num">03</span>DB 실전 구성</a>
+    <a href="#firebase"><span class="num">04</span>Firebase 연결</a>
+    <a href="#upload"><span class="num">05</span>데이터 업로드</a>
+    <a href="#web"><span class="num">06</span>웹페이지 배포</a>
+    <a href="#pagination"><span class="num">07</span>더 보기 기능</a>
+    <a href="#troubleshoot"><span class="num">08</span>트러블슈팅</a>
+    <a href="#source"><span class="num">09</span>사용한 CSV</a>
+    <a href="#next"><span class="num">10</span>다음 단계</a>
+  </nav>
+
+  <main>
+
+    <section id="overview">
+      <div class="kicker"><span class="idx">00</span></div>
+      <h2>오늘 만든 전체 파이프라인</h2>
+      <p class="lede">한 문장으로 요약하면: 흩어져 있던 웹툰 CSV 데이터를 클라우드 DB에 올리고, 인터넷에서 누구나 볼 수 있는 웹페이지로 만들었습니다.</p>
+      <div class="flow">
+        <span class="step">📄 webtoon_clean.csv</span>
+        <span class="arrow">→</span>
+        <span class="step">🗄️ SQLite (로컬 실습)</span>
+        <span class="arrow">→</span>
+        <span class="step">☁️ Firestore</span>
+        <span class="arrow">→</span>
+        <span class="step">🌐 Firebase Hosting</span>
+      </div>
+      <p>각 화살표가 하나의 절이라고 생각하면 됩니다. 아래로 내려가며 순서대로 읽으면 오늘 한 작업이 왜 필요했는지, 어떤 명령어를 왜 썼는지 이어집니다.</p>
+    </section>
+
+    <section id="terminal">
+      <div class="kicker"><span class="idx">01</span><span class="tag done">완료</span></div>
+      <h2>터미널 환경 정리</h2>
+      <p class="lede">본격적인 작업 전에 파이썬 학습 파일을 정리하고, 필요한 도구들을 설치했습니다.</p>
+
+      <div class="codeblock">
+        <div class="bar"><span class="label">PowerShell</span><button class="copy" data-copy>복사</button></div>
+        <pre><code>python --version
+New-Item -ItemType Directory -Path "$HOME\Documents\python_study" -Force
+Move-Item -Path "C:\*.py" -Destination "$HOME\Documents\python_study\"
+Test-Path "$HOME\Documents\python_study"
+
+pip install requests pandas
+pip install matplotlib
+
+npm install -g @anthropic-ai/claude-code
+claude --version
+claude</code></pre>
+      </div>
+
+      <table>
+        <thead><tr><th>명령어</th><th>의미</th></tr></thead>
+        <tbody>
+          <tr><td><code>New-Item -ItemType Directory</code></td><td>새 폴더 생성. <code>-Force</code>는 이미 있어도 에러 없이 넘어감</td></tr>
+          <tr><td><code>Move-Item</code></td><td>파일 이동 (복사가 아님 — 원본은 사라짐)</td></tr>
+          <tr><td><code>pip install</code></td><td>파이썬 패키지(라이브러리) 설치</td></tr>
+          <tr><td><code>npm install -g</code></td><td>Node.js 패키지를 전역 설치 — 어느 폴더에서든 명령어 사용 가능</td></tr>
+        </tbody>
+      </table>
+
+      <p>이 과정을 거쳐 <code>requests</code>(웹 요청), <code>pandas</code>(표 데이터 처리), <code>matplotlib</code>(그래프), 그리고 <strong>Claude Code</strong> CLI까지 설치를 마쳤습니다 — 지금 이 문서도 그 결과로 만들어진 것입니다.</p>
+    </section>
+
+    <section id="git">
+      <div class="kicker"><span class="idx">02</span><span class="tag done">개념 정리</span></div>
+      <h2>Git 개념 — commit과 push</h2>
+      <p class="lede">웹툰 프로젝트를 GitHub(<code>kjyilj0707/webtoon_project</code>)에 연결하면서 정리한 핵심 개념입니다.</p>
+
+      <div class="flow">
+        <span class="step">Working Dir</span>
+        <span class="arrow">add →</span>
+        <span class="step">Staging</span>
+        <span class="arrow">commit →</span>
+        <span class="step">Local Repo</span>
+        <span class="arrow">push →</span>
+        <span class="step">GitHub (origin)</span>
+      </div>
+
+      <h3>Commit — 로컬에 남기는 저장 지점</h3>
+      <p>지금 이 순간의 파일 상태를 하나의 스냅샷으로 남기는 것. 인터넷 연결 없이도 가능하며, 실수해도 이전 커밋으로 되돌릴 수 있는 안전망 역할을 합니다.</p>
+
+      <h3>Push — 원격 저장소로 업로드</h3>
+      <p>로컬에만 있던 커밋들을 GitHub 같은 원격 저장소로 올려서 백업·공유하는 것. <code>push</code>해야 비로소 다른 컴퓨터나 서버가 내 코드를 받아볼 수 있습니다.</p>
+
+      <div class="callout why">
+        <span class="glyph">💡</span>
+        <p><strong>.gitignore와 .env</strong> — API 키 같은 민감 정보는 <code>.env</code>에 담고 git 추적에서 제외합니다. 대신 어떤 변수가 필요한지 양식만 보여주는 <code>.env.example</code>을 올려서, 다른 사람(미래의 나 포함)이 무엇을 채워야 하는지 알 수 있게 합니다.</p>
+      </div>
+    </section>
+
+    <section id="database">
+      <div class="kicker"><span class="idx">03</span><span class="tag done">실습 완료</span></div>
+      <h2>데이터베이스 실전 구성 — SQLite</h2>
+      <p class="lede">CSV 대신 실제로 SQL 쿼리가 가능한 로컬 DB를 만들어봤습니다.</p>
+
+      <div class="codeblock">
+        <div class="bar"><span class="label">Python</span><button class="copy" data-copy>복사</button></div>
+        <pre><code>import sqlite3
+import pandas as pd
+
+df = pd.read_csv('webtoon_clean.csv')
+conn = sqlite3.connect('webtoon.db')
+df.to_sql('webtoons', conn, if_exists='replace', index=False)
+conn.close()</code></pre>
+      </div>
+
+      <p><code>to_sql()</code>이 CSV의 컬럼 타입(<code>int64</code> → <code>INTEGER</code>, <code>float64</code> → <code>REAL</code> 등)을 보고 SQL 테이블 스키마를 자동으로 만들어줍니다.</p>
+
+      <div class="result"><span class="glyph">✓</span> <span><code>webtoons</code> 테이블에 <strong>27개 컬럼, 3,846행</strong> 저장 확인 (titleName, viewCount, favoriteCount 등)</span></div>
+
+      <div class="callout why">
+        <span class="glyph">💡</span>
+        <p>SQLite를 먼저 써본 이유는 서버 설치 없이 <strong>파일 하나</strong>로 DB 개념(테이블·쿼리)을 실습할 수 있기 때문입니다. 이후 클라우드로 옮길 때 Firestore로 자연스럽게 이어집니다.</p>
+      </div>
+    </section>
+
+    <section id="firebase">
+      <div class="kicker"><span class="idx">04</span><span class="tag done">완료</span></div>
+      <h2>Firebase 프로젝트 연결</h2>
+      <p class="lede">로컬 DB를 넘어, 인터넷 어디서나 접근 가능한 클라우드 DB로 <strong>Firestore</strong>를 선택했습니다.</p>
+
+      <h3>진행한 단계</h3>
+      <ol>
+        <li>Firebase 콘솔에서 프로젝트 생성 → 프로젝트 ID <code>wtproject-5a00f</code></li>
+        <li>Firestore Database 활성화 (테스트 모드, 서울 리전)</li>
+        <li>서비스 계정 키 발급 → <code>serviceAccountKey.json</code>으로 저장</li>
+        <li>파이썬에 <code>firebase-admin</code> 라이브러리 설치</li>
+      </ol>
+
+      <div class="callout fix">
+        <span class="glyph">🔧</span>
+        <p><strong>중간에 만난 문제:</strong> <code>pip install firebase-admin</code> 실행 시 <code>No module named pip</code> 에러 발생. 이 파이썬 설치본에 pip 자체가 빠져 있던 것 — <code>python -m ensurepip --upgrade</code>로 pip를 복구한 뒤 설치를 진행했습니다.</p>
+      </div>
+
+      <p>키 파일은 DB 전체를 조작할 수 있는 마스터키급 권한을 가지므로, <code>.gitignore</code>에 아래 항목을 추가해 git에 절대 올라가지 않도록 했습니다.</p>
+
+      <div class="codeblock">
+        <div class="bar"><span class="label">.gitignore</span><button class="copy" data-copy>복사</button></div>
+        <pre><code>serviceAccountKey.json
+*firebase-adminsdk*.json
+*.db</code></pre>
+      </div>
+    </section>
+
+    <section id="upload">
+      <div class="kicker"><span class="idx">05</span><span class="tag done">완료</span></div>
+      <h2>Firestore에 데이터 업로드</h2>
+      <p class="lede"><code>firebase_migrate.py</code> 스크립트로 <code>webtoon_clean.csv</code> 전체를 클라우드로 옮겼습니다.</p>
+
+      <div class="codeblock">
+        <div class="bar"><span class="label">firebase_migrate.py (핵심 부분)</span><button class="copy" data-copy>복사</button></div>
+        <pre><code>batch = db.batch()
+for _, row in df.iterrows():
+    doc_ref = collection_ref.document(str(row["titleId"]))
+    batch.set(doc_ref, row.to_dict())
+    count += 1
+    if count % 400 == 0:      # Firestore 배치 쓰기 한도(500건) 안에서
+        batch.commit()        # 400건씩 묶어서 커밋
+        batch = db.batch()</code></pre>
+      </div>
+
+      <div class="callout why">
+        <span class="glyph">💡</span>
+        <p>한 건씩 업로드하면 3,846번 개별 요청을 보내야 해서 느립니다. <strong>배치(batch)</strong>로 여러 건을 묶어 한 번에 커밋하면 훨씬 빠르고 안정적입니다.</p>
+      </div>
+
+      <div class="result"><span class="glyph">✓</span> <span><strong>3,846건</strong> 전체 업로드 완료. 조회수 1위 검증: <em>마음의소리 — 2,593,260,741</em></span></div>
+    </section>
+
+    <section id="web">
+      <div class="kicker"><span class="idx">06</span><span class="tag done">완료</span></div>
+      <h2>웹페이지로 배포 — Firebase Hosting</h2>
+      <p class="lede">Firestore 데이터를 브라우저에서 표로 볼 수 있는 페이지를 만들고, 인터넷에 공개했습니다.</p>
+
+      <h3>만든 파일 구조</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>파일</th><th>역할</th></tr></thead>
+          <tbody>
+            <tr><td><code>public/index.html</code></td><td>페이지 뼈대 (검색창, 정렬 선택, 표)</td></tr>
+            <tr><td><code>public/app.js</code></td><td>Firestore에서 데이터를 읽어와 표를 그리는 로직</td></tr>
+            <tr><td><code>public/firebase-config.js</code></td><td>브라우저용 공개 설정값 (Firebase 콘솔에서 발급)</td></tr>
+            <tr><td><code>firestore.rules</code></td><td>보안 규칙 — 읽기는 누구나, 쓰기는 차단</td></tr>
+            <tr><td><code>firebase.json</code> / <code>.firebaserc</code></td><td>어떤 폴더를 배포할지, 어떤 프로젝트인지 지정</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="codeblock">
+        <div class="bar"><span class="label">firestore.rules</span><button class="copy" data-copy>복사</button></div>
+        <pre><code>match /webtoons/{docId} {
+  allow read: if true;
+  allow write: if false;
+}</code></pre>
+      </div>
+
+      <div class="codeblock">
+        <div class="bar"><span class="label">배포 명령</span><button class="copy" data-copy>복사</button></div>
+        <pre><code>firebase.cmd deploy --only firestore:rules,hosting</code></pre>
+      </div>
+
+      <div class="result"><span class="glyph">✓</span> <span>배포 완료 — <a class="link" href="https://wtproject-5a00f.web.app" target="_blank" rel="noopener">wtproject-5a00f.web.app</a> 에서 실제 데이터 확인 가능</span></div>
+    </section>
+
+    <section id="pagination">
+      <div class="kicker"><span class="idx">07</span><span class="tag action">개선</span></div>
+      <h2>"더 보기" 기능 추가</h2>
+      <p class="lede">처음엔 상위 100개만 보이도록 만들었는데, 이유를 묻는 질문을 계기로 페이지네이션을 붙였습니다.</p>
+
+      <div class="callout why">
+        <span class="glyph">💡</span>
+        <p>Firestore는 문서를 읽을 때마다 비용/한도가 소모됩니다. 3,846건을 한 번에 다 불러오면 느리고 낭비가 커서, 처음엔 <code>limit(100)</code>으로 제한했습니다.</p>
+      </div>
+
+      <p>이후 <strong>Firestore의 <code>startAfter</code> 커서</strong> 개념을 이용해 "더 보기" 버튼을 누를 때마다 다음 100개씩 이어서 불러오도록 개선했습니다. 커서는 "마지막으로 읽은 문서"를 기억해뒀다가, 다음 조회 때 그 지점부터 이어 읽는 방식입니다.</p>
+
+      <div class="codeblock">
+        <div class="bar"><span class="label">app.js (핵심 부분)</span><button class="copy" data-copy>복사</button></div>
+        <pre><code>const q = lastDoc
+  ? query(col, orderBy(sortField, "desc"), startAfter(lastDoc), limit(100))
+  : query(col, orderBy(sortField, "desc"), limit(100));</code></pre>
+      </div>
+    </section>
+
+    <section id="troubleshoot">
+      <div class="kicker"><span class="idx">08</span><span class="tag fix">트러블슈팅</span></div>
+      <h2>오늘 만난 문제와 해결 과정</h2>
+      <p class="lede">실습에서 가장 많이 배우는 부분은 사실 에러를 해결하는 과정입니다. 오늘 겪은 네 가지를 정리합니다.</p>
+
+      <h3>1. pip이 통째로 빠져있던 파이썬</h3>
+      <p><code>No module named pip</code> → <code>python -m ensurepip --upgrade</code>로 pip 자체를 복구.</p>
+
+      <h3>2. PowerShell이 firebase 명령을 거부함</h3>
+      <p>npm으로 설치한 CLI는 <code>.ps1</code> 스크립트로도 동작하는데, PowerShell의 기본 보안 정책이 스크립트 실행을 막았습니다. 처음엔 <code>firebase.cmd</code>로 우회했고, 이후 사용자 요청으로 정책 자체를 변경했습니다.</p>
+      <div class="codeblock">
+        <div class="bar"><span class="label">PowerShell (관리자 권한 불필요, 내 계정에만 적용)</span><button class="copy" data-copy>복사</button></div>
+        <pre><code>Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned</code></pre>
+      </div>
+
+      <h3>3. "세션 ID"와 "인증 코드"를 혼동</h3>
+      <p><code>firebase login --no-localhost</code> 흐름에서 화면에 뜨는 <strong>세션 ID</strong>(예: F5A25)를 인증 코드란에 그대로 입력해 실패. 실제 인증 코드는 <strong>브라우저에서 로그인을 마친 뒤</strong>에만 발급됩니다.</p>
+
+      <h3>4. 인증 코드 만료</h3>
+      <p>두 번째 시도에서는 코드 형식은 맞았지만(<code>4/0AXEQ...</code>) 시간이 지체돼 만료된 것으로 추정. 결국 코드를 손으로 옮기지 않아도 되는 <strong>일반 <code>firebase login</code></strong>(로컬 브라우저 자동 콜백 방식)으로 전환해 성공.</p>
+
+      <div class="callout why">
+        <span class="glyph">🗑️</span>
+        <p><strong>덤으로 발견한 것:</strong> 32MB짜리 <code>node-v24.18.1-x64.msi</code> 설치 파일이 프로젝트 폴더에 방치돼 있었습니다. git에 잡히기 전에 <code>.gitignore</code>에 <code>*.msi</code>를 추가해 제외했습니다.</p>
+      </div>
+    </section>
+
+    <section id="source">
+      <div class="kicker"><span class="idx">09</span></div>
+      <h2>어떤 CSV로 DB를 만들었나</h2>
+      <p class="lede">프로젝트 폴더에는 CSV가 여러 개 있는데, 그중 <strong><code>webtoon_clean.csv</code></strong>를 선택했습니다.</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>파일</th><th>성격</th></tr></thead>
+          <tbody>
+            <tr><td><code>webtoon_raw.csv</code></td><td>크롤링 직후, 가공 안 된 원본</td></tr>
+            <tr><td><code>webtoon_detail.csv</code> / <code>_temp.csv</code></td><td>상세 정보 수집 중간 산출물</td></tr>
+            <tr><td><code>webtoon_errors.csv</code></td><td>수집 중 에러난 항목 로그</td></tr>
+            <tr><td><code>webtoon_clean.csv</code></td><td><strong>정제까지 끝낸 최종 데이터</strong> (3,846건, 27개 컬럼)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>다른 버전으로 DB를 다시 만들고 싶다면 <code>firebase_migrate.py</code>의 <code>CSV_PATH</code> 값만 바꿔서 재실행하면 됩니다.</p>
+    </section>
+
+    <section id="next">
+      <div class="kicker"><span class="idx">10</span></div>
+      <h2>다음 단계</h2>
+      <p class="lede">오늘 만든 파이프라인 위에 이어서 해볼 만한 것들입니다.</p>
+      <ul>
+        <li><strong>보안 규칙 강화</strong> — 현재 읽기는 완전 공개 상태. 필요하다면 인증 기반으로 제한</li>
+        <li><strong>크롤링 자동화</strong> — GitHub Actions로 정기적으로 새 데이터 수집 → Firestore 자동 갱신</li>
+        <li><strong>대시보드 확장</strong> — 태그별 필터, 연도별 추이 차트 등 추가</li>
+      </ul>
+      <p class="footline">이 문서는 오늘의 작업 로그를 학습용으로 정리한 것으로, 실제 코드와 설정은 프로젝트 폴더의 파일이 원본입니다.</p>
+    </section>
+
+  </main>
+</div>
+
+<script>
+  document.getElementById('printBtn').addEventListener('click', () => {
+    window.print();
+  });
+
+  document.querySelectorAll('.copy').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const code = btn.closest('.codeblock').querySelector('code').innerText;
+      navigator.clipboard.writeText(code).then(() => {
+        const original = btn.textContent;
+        btn.textContent = '복사됨';
+        setTimeout(() => { btn.textContent = original; }, 1400);
+      });
+    });
+  });
+
+  const links = Array.from(document.querySelectorAll('nav.toc a'));
+  const sections = links.map((a) => document.querySelector(a.getAttribute('href')));
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      const id = '#' + entry.target.id;
+      const link = links.find((a) => a.getAttribute('href') === id);
+      if (!link) return;
+      if (entry.isIntersecting) {
+        links.forEach((a) => a.classList.remove('active'));
+        link.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+
+  sections.forEach((s) => s && observer.observe(s));
+</script>
+</body>
+</html>
