@@ -21,6 +21,7 @@ const summary = document.getElementById("summary");
 const searchInput = document.getElementById("searchInput");
 const sortSelect = document.getElementById("sortSelect");
 const loadMoreBtn = document.getElementById("loadMoreBtn");
+const loadAllBtn = document.getElementById("loadAllBtn");
 
 let currentRows = [];
 let lastDoc = null;
@@ -50,7 +51,20 @@ async function fetchNextPage(sortField) {
 
   summary.textContent = `총 ${currentRows.length}개 작품 표시 중 (기준: ${sortSelect.selectedOptions[0].text})`;
   loadMoreBtn.hidden = !hasMore;
+  loadAllBtn.hidden = !hasMore;
   renderRows(currentRows);
+}
+
+async function loadAll(sortField) {
+  loadMoreBtn.disabled = true;
+  loadAllBtn.disabled = true;
+  while (hasMore) {
+    loadAllBtn.textContent = `불러오는 중... (${currentRows.length}개)`;
+    await fetchNextPage(sortField);
+  }
+  loadAllBtn.textContent = "전체 불러오기";
+  loadMoreBtn.disabled = false;
+  loadAllBtn.disabled = false;
 }
 
 function renderRows(rows) {
@@ -98,6 +112,10 @@ sortSelect.addEventListener("change", () => {
 
 loadMoreBtn.addEventListener("click", () => {
   fetchNextPage(sortSelect.value);
+});
+
+loadAllBtn.addEventListener("click", () => {
+  loadAll(sortSelect.value);
 });
 
 loadData(sortSelect.value);
